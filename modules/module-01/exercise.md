@@ -125,6 +125,7 @@ This can be a sketch on paper, a whiteboard photo, or ASCII art committed to you
                          | service          | 
                          +------------------+ +-----------------+
 
+```
 ---
 
 ## Discussion _(~15 min)_
