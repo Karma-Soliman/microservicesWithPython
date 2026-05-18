@@ -45,6 +45,7 @@ frontend/*.local
 
 #databases
 users.db
+games.db
 
 
 modules/module-03/*
