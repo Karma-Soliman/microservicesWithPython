@@ -9,6 +9,7 @@
 # - fetch_all_games(db, limit, offset) -> GameList
 # - find_games(db, q, limit, offset) -> GameList   (delegates to search_games in repository)
 
+
 from sqlalchemy.orm import Session
 from app import repository
 from app.schemas import GameCreate, GameOut, GameList
@@ -43,3 +44,12 @@ def find_games(db: Session, q: str, limit: int = 20, offset: int = 0) -> GameLis
         limit=limit,
         offset=offset,
     )
+
+#
+# Module 5 — CQRS:
+# In add_game(), after saving to the DB, also write to the Redis cache:
+#   from app.infrastructure.cache import set_game_summary
+#   set_game_summary(game.id, {"id": game.id, "title": game.title,
+#                               "genre": game.genre, "platform": game.platform,
+#                               "cover_url": game.cover_url})
+
