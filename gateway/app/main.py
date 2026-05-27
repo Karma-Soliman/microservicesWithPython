@@ -53,6 +53,7 @@ async def proxy(request: Request, path: str):
         Index 1 is the resource ("users", "games", "activities", ...).
 
         If the path has fewer than 2 segments, return a 404.
+    
 
     ---
     Step 2 — Look up the resource in ROUTES.
@@ -104,4 +105,35 @@ async def proxy(request: Request, path: str):
         curl http://localhost:8000/v1/unknown   # should return 404
     """
     # TODO: implement steps 1–4 above
-    raise NotImplementedError("implement the proxy forwarding logic")
+    # step 1
+    segments = path.split("/")
+    if len(segments) < 2: 
+        return Response(status_code=404, content="Not found")
+
+    resource = segments[1]
+
+    # step 2
+    target_base = ROUTES.get(resource)
+    if target_base is None:
+        return Response(status_code=404, content=f"Unknown resource: {resource}")
+
+    # step 3
+    target_url = f"{target_base}/{path}"
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.request(
+                method=request.method,
+                url=target_url,
+                headers=request.headers.raw,
+                content=await request.body(),
+                params=request.query_params,
+            )
+        return Response(
+            content=response.content,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            media_type=response.headers.get("content-type"),
+        )
+    # step 4 
+    except httpx.RequestError:
+        return Response(status_code=503, content="Service unavailable")
