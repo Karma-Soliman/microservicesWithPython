@@ -43,8 +43,10 @@ frontend/dist
 frontend/dist-ssr
 frontend/*.local
 
-
-
+#databases
+users.db
+games.db
+activities.db
 
 
 modules/module-05/*
