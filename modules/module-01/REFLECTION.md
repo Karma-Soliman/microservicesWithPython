@@ -24,6 +24,10 @@ Think about it from three angles: the developer who has to change code, the team
 
 > _Your answer:_
 
+The problem that felt most real today is the user one.
+
+Splitting the monolith solves the problem of one change affecting the whole platform. It also helps failures stay smaller; if the notification-service crashes, users don't lose their feed or their ability to log games. In a monolith, the user has no platform at all.
+
 ---
 
 ## 2. Your choice
@@ -36,6 +40,8 @@ What would break, slow down, or become harder to manage if you merged those two 
 
 > _Your answer:_
 
+I chose to keep activity-service separate from game-service. A game is catalogue data. An activity is user behavior. If these were merged, the game catalogue would become responsible for user behavior and feed logic, which would make it harder to evolve search, recommendations, and social features independently.
+
 ---
 
 ## 3. The tradeoff
@@ -47,6 +53,9 @@ Microservices solve the monolith's problems. But they create new ones.
 No need to solve it: just name it honestly. This is exactly the tension the rest of the course is about.
 
 > _Your answer:_
+
+The monolith made function calls simple. Activity-service has to call game-service over HTTP and handle failure, partial failures to be exact.
+
 
 ---
 

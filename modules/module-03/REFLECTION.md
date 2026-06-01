@@ -20,6 +20,11 @@ Think about what the client would need to know and manage if it talked to each s
 
 > *Your answer:*
 
+The gateway gives the client one  entry point instead of making it know every service URL and port. Without it, the frontend would need to know that users are on port 8001, games are on 8002, and activities are on 8003. That would leak backend architecture into the client and make every service movement a frontend problem.
+
+With the gateway, the client only talks to localhost:8000.
+
+
 ---
 
 ## 2. Your choice
@@ -32,6 +37,11 @@ What is the consequence for the user in each case if the downstream service is u
 
 > *Your answer:*
 
+An activity should not exist for a user that does not exist. If user-service is temporarily unreachable, retrying once makes sense because the failure might be a network issue. If validation still fails, the activity should not be saved.
+
+The activity can still be valid even if game-service is down. "game": null is better than failing the whole request. The user can still log the activity.
+
+
 ---
 
 ## 3. The tradeoff
@@ -43,6 +53,11 @@ Every time a client creates an activity, three services are involved synchronous
 What happens to the user experience if the slowest service in the chain takes 3 seconds to respond?
 
 > *Your answer:*
+
+
+The risk of synchronous chaining is that the whole request becomes dependent on multiple services being available and fast. If one critical service is slow or unavailable, the user feels it immediately.
+
+If the slowest service takes 3 seconds to respond, the whole request can take at least 3 seconds. That makes the app feel slow even if most services are healthy.
 
 ---
 

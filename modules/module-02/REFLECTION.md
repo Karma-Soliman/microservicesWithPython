@@ -20,6 +20,9 @@ Think about what happens six months later when someone new joins the team, or wh
 
 > *Your answer:*
 
+The layered structure makes each file responsible for one kind of decision. And it makes the boundaries explicit, this protects us from mixing concerns so swapping SQLite for PostgreSQL means touching one file.
+
+
 ---
 
 ## 2. Your choice
@@ -31,6 +34,10 @@ Each service owns its data exclusively — no other service is allowed to touch 
 Give a concrete scenario, not a general principle.
 
 > *Your answer:*
+
+I choose the `Game` entity.
+
+If another service could write directly to the games table, it could create invalid or inconsistent catalogue data. For example, activity-service might insert a game while logging an activity, if it forgets required fields like genre or platform. Then the frontend search and game listing could show broken games. By forcing other services to go through the game-service API, the game-service keeps control over validation and the shape of game data.
 
 ---
 
@@ -44,6 +51,8 @@ And at what point does the complexity start to pay off? Where is the tipping poi
 
 > *Your answer:*
 
----
+ For only a few endpoints, the CRUD service now has many files. It feels slower than writing everything directly in `main.py`. There are also more imports and more setup work before the service runs.
+
+The complexity starts to pay off when the service grows beyond simple CRUD: more endpoints, authentication, or multiple developers working at the same time. The tipping point is when changing one part of the service should not risk breaking the other part.
 
 *Keep this file. You will refer back to it during the oral presentation.*

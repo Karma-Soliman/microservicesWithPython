@@ -29,8 +29,11 @@ For each bounded context you identify, fill in the table:
 | Bounded Context | Responsibilities                                         | Owned Entities | Team        |
 | --------------- | -------------------------------------------------------- | -------------- | ----------- |
 | Identity        | Manages who users are, handles registration and profiles | User, Session  | Platform    |
-| Game Library    | _(fill in)_                                              | _(fill in)_    | _(fill in)_ |
-| _(add more)_    |                                                          |                |             |
+| Game Catalogue    | Manages the list of the games, search games                                              | Game   | Catalogue |
+| Activity    | Records user actions, the feed is built by a combination of activity data and game data                                                          | Activity               | Social            |
+| Notifications    | Creates notifications for user from asyncs                                                          | Notification               | Engagment            |
+| Logging    | stores consent decisions, consented activity, supports right to erasure                                                          | Consent, Logs               | Compliance            |
+| Authentication    | Assigns and validates JWT tokens                                                          | Token               | Security            |
 
 There is no single correct answer: what matters is that you can justify each row.
 
@@ -56,6 +59,29 @@ Payload: { activity_id, user_id, action, game_id, timestamp }
 
 Focus on the flows that feel non-obvious. You do not need to document every possible pair.
 
+```
+gateway -> user-service
+Trigger: client creates or reads users
+Protocol: REST
+Payload: {id, username, email, is_active, created_at}
+```
+
+gateway -> game-services is similar. 
+
+```
+gateway -> auth-service
+Trigger: login, token validation
+Protocol: shared JWT validation depending on module
+Payload: {username, password}
+```
+
+```
+activity-service -> notification-service
+Trigger: user activity should produce a notification
+Protocol: RabbitMQ event, async
+Payload: { user_id, type, message, created_at }
+```
+
 ---
 
 ## Task 3 — Draw the service map _(~20 min)_
@@ -69,6 +95,37 @@ Draw the full GameHub service map:
 
 This can be a sketch on paper, a whiteboard photo, or ASCII art committed to your branch.
 
+```text
+                         Client / Frontend
+                                |
+                                | 
+                                v
+                         +-------------+
+                         |   gateway   |
+                         +-------------+
+                          |     |     |      \
+                    REST  |     |     | REST  \ REST/JWT
+                          v     v     v        v
+                +-------------+ +-------------+ +----------------+
+                | user-service| | game-service| | auth-service   |
+                +-------------+ +-------------+ +----------------+
+                                      ^
+                                      |
+                                      | REST: fetch game summary/details
+                                      |
+                                +------------------+
+                                | activity-service |
+                                +------------------+
+                                   |            |
+                                               
+                      RabbitMQ     |            | RabbitMQ
+                      event        v            v
+                         +------------------+ +-----------------+
+                         | notification-    | | logging-service |
+                         | service          | 
+                         +------------------+ +-----------------+
+
+```
 ---
 
 ## Discussion _(~15 min)_
