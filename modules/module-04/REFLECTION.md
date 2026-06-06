@@ -20,6 +20,10 @@ Think about what happens under load, or when notification-service is temporarily
 
 > *Your answer:*
 
+Activity-service gains speed. Once the activity is saved and the message is published to rabbitmq, the request can finish without depending on notification-service.
+
+Notification-service gains the ability to move at its own pace. If notification-service is temporarily down, the activity request can still be sent through and the notifications can be processed later when it's up again.
+
 ---
 
 ## 2. Your choice
@@ -32,6 +36,8 @@ Think about what happens if notification-service is slow, or crashes mid-message
 
 > *Your answer:*
 
+Notifications do not need to be part of the immediate activity response, so a direct HTTP call would be unnecessary. The broker allows us to decouple.
+
 ---
 
 ## 3. The tradeoff
@@ -43,6 +49,10 @@ With synchronous REST, you get an immediate answer: success or failure. With asy
 What visibility do you lose when you go async?
 
 > *Your answer:*
+
+They would only notice indirectly, for example if the notification does not appear in their notification list.
+
+As a developer, I now need to observe RabbitMQ queues, consumer logs, database records. Going async makes the user request more resilient, but it also makes debugging harder because the work happens later and in another service.
 
 ---
 
