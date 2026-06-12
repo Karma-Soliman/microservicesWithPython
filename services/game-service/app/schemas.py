@@ -40,3 +40,11 @@ class GameList(BaseModel):
     total: int
     limit: int
     offset: int
+
+
+class GameSummary(BaseModel):
+    id: str
+    title: str
+    genre: str
+    platform: str
+    cover_url: str | None = None

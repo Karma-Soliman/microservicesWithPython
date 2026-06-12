@@ -35,6 +35,14 @@ def search_games(
     return service.find_games(db, q, limit=limit, offset=offset)
 
 
+@router.get("/{game_id}/summary", response_model=schemas.GameSummary)
+def get_game_summary(game_id: str):
+    try:
+        return service.fetch_game_summary(game_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
 @router.get("/{game_id}", response_model=schemas.GameOut)
 def get_game(game_id: str, db: Session = Depends(get_db)): 
     try:
