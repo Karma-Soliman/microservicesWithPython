@@ -48,6 +48,8 @@ users.db
 games.db
 activities.db
 notifications.db
+logging.db
+instance/
 
 modules/module-05/*
 modules/module-06/*
