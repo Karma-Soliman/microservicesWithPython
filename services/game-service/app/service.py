@@ -63,6 +63,13 @@ def fetch_game_summary(game_id: str) -> GameSummary:
         raise ValueError(f"Game summary {game_id} not found")
     return GameSummary(**summary)
 
+
+def remove_game(db: Session, game_id: str) -> dict:
+    deleted = repository.delete_game(db, game_id)
+    if not deleted:
+        raise ValueError(f"Game {game_id} not found")
+    return {"id": game_id, "deleted": True}
+
 #
 # Module 5 — CQRS:
 # In add_game(), after saving to the DB, also write to the Redis cache:
@@ -70,4 +77,3 @@ def fetch_game_summary(game_id: str) -> GameSummary:
 #   set_game_summary(game.id, {"id": game.id, "title": game.title,
 #                               "genre": game.genre, "platform": game.platform,
 #                               "cover_url": game.cover_url})
-
