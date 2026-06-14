@@ -20,6 +20,10 @@ Think about what happens when you need to rotate the secret key, or add a new se
 
 > *Your answer:*
 
+Centralising authentication at the gateway gives the system one front door. The client sends a token once, the gateway verifies it, and invalid requests are rejected before reaching the services. This keeps the same identity check from being duplicated in every service.
+
+If every service validated tokens independently, each service would need the same security logic, config, and secret management. Adding a new service would mean remembering to implement auth again. Rotating the secret key would also become harder because every service would need to be updated correctly.
+
 ---
 
 ## 2. Your choice
@@ -32,6 +36,9 @@ What would break, or what door would you accidentally leave open, if services pa
 
 > *Your answer:*
 
+It is activity-service performing a system-level validation. The M2M token makes that identity clear: the caller is the service, with role `service`.
+
+If services passed user tokens around freely, user identity could leak deeper into the system than necessary. It would also make it harder to know whether an action was performed by the user or by a service on behalf of the workflow.
 ---
 
 ## 3. The tradeoff
@@ -43,6 +50,10 @@ The gateway and the auth-service share the same `SECRET_KEY` to verify tokens wi
 And what would the alternative look like — verifying tokens by calling auth-service on every request instead? What does that cost you?
 
 > *Your answer:*
+
+Sharing the `SECRET_KEY` is powerful but risky. Any service with that key can verify tokens, but if the key leaks, an attacker could forge valid tokens and pretend to be any user or role, including admin.
+
+The alternative is for the gateway to call auth-service on every request to verify the token. Hoever, it adds network latency and makes auth-service a critical dependency for every request. If auth-service is slow or down, the whole platform may become unavailable.
 
 ---
 
