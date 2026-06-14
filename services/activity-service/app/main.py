@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import Base, engine, get_db
 from app import repository, schemas
+from app.infrastructure.auth_client import get_auth_headers
 from app.infrastructure.rabbitmq_publisher import publish_activity_event
 
 Base.metadata.create_all(bind=engine)
@@ -44,8 +45,9 @@ async def validate_user(user_id: str) -> None:
     async with httpx.AsyncClient(timeout=5.0) as client:
         for attempt in range(2):
             try:
-                response = await client.get(url)
-            except httpx.RequestError:
+                headers = await get_auth_headers()
+                response = await client.get(url, headers=headers)
+            except httpx.HTTPError:
                 if attempt == 0:
                     continue
                 raise HTTPException(
