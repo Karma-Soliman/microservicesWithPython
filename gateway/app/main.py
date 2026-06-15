@@ -119,13 +119,20 @@ async def proxy(request: Request, path: str):
         and segments[1] == "auth"
         and segments[2] == "token"
     )
+    is_public_user_signup = (
+        request.method == "POST"
+        and segments[0] == "v1"
+        and segments[1] == "users"
+        and len(segments) in (2, 3)
+        and (len(segments) == 2 or segments[2] == "")
+    )
 
     # step 2
     target_base = ROUTES.get(resource)
     if target_base is None:
         return Response(status_code=404, content=f"Unknown resource: {resource}")
 
-    if not is_public_auth_token:
+    if not (is_public_auth_token or is_public_user_signup):
         auth_header = request.headers.get("authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
             return Response(status_code=401, content="Missing or invalid token")
